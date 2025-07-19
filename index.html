@@ -1,35 +1,32 @@
 <!DOCTYPE html>
 <html>
 <head>
-<style> 
-div {
-  width: 100px;
-  height: 100px;
-  background-color: red;
-  position: relative;
-  animation-name: example;
-  animation-duration: 4s;
-}
-
-@keyframes example {
-  0%   {background-color:red; left:0px; top:0px;}
-  25%  {background-color:yellow; left:200px; top:0px;}
-  50%  {background-color:blue; left:200px; top:200px;}
-  75%  {background-color:green; left:0px; top:200px;}
-  100% {background-color:red; left:0px; top:0px;}
-}
-</style>
+  <title>ESP Control</title>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 </head>
 <body>
+  <h2>ESP Control Panel</h2>
+  <button onclick="sendCommand('ON')">Turn ON</button>
+  <button onclick="sendCommand('OFF')">Turn OFF</button>
 
-<h2>Gls smarthome technicien</h2>
+  <script>
+    const firebaseConfig = {
+      apiKey: "YOUR-API-KEY",
+      authDomain: "YOUR-PROJECT.firebaseapp.com",
+      databaseURL: "https://YOUR-PROJECT.firebaseio.com",
+      projectId: "YOUR-PROJECT-ID",
+      storageBucket: "YOUR-PROJECT.appspot.com",
+      messagingSenderId: "YOUR-SENDER-ID",
+      appId: "YOUR-APP-ID"
+    };
 
-<div></div>
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
 
-<p><b>Nb:</b> ceci est votre page d'actualisation</p>
-<p>Toutes les mise à jour seront affichees ici !!!!!!!!!!!!!!</p>
-
+    function sendCommand(cmd) {
+      db.ref("/device").set({ command: cmd });
+    }
+  </script>
 </body>
 </html>
-
-
