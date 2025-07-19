@@ -6,20 +6,21 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 </head>
 <body>
-  <h2>ESP Control Panel</h2>
+  <h2>GLS ESP INTERNET</h2>
   <button onclick="sendCommand('ON')">Turn ON</button>
   <button onclick="sendCommand('OFF')">Turn OFF</button>
 
   <script>
     const firebaseConfig = {
-      apiKey: "YOUR-API-KEY",
-      authDomain: "YOUR-PROJECT.firebaseapp.com",
-      databaseURL: "https://YOUR-PROJECT.firebaseio.com",
-      projectId: "YOUR-PROJECT-ID",
-      storageBucket: "YOUR-PROJECT.appspot.com",
-      messagingSenderId: "YOUR-SENDER-ID",
-      appId: "YOUR-APP-ID"
-    };
+  apiKey: "AIzaSyCbUMHr-1pWWlhlFuyG8E4AdfOYn5tWIhM",
+  authDomain: "food-details-554cf.firebaseapp.com",
+  databaseURL: "https://food-details-554cf-default-rtdb.firebaseio.com",
+  projectId: "food-details-554cf",
+  storageBucket: "food-details-554cf.firebasestorage.app",
+  messagingSenderId: "617865162295",
+  appId: "1:617865162295:web:e8e44fc0c45146ae2819b2",
+  measurementId: "G-VGYFY56WSV"
+};
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
