@@ -1,33 +1,158 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>ESP Control</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ESP Light Control</title>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f4f4f4;
+    }
+
+    .header {
+      background: #003366;
+      color: white;
+      text-align: center;
+      padding: 15px;
+      font-size: 20px;
+    }
+
+    .light-list {
+      display: flex;
+      flex-direction: column;
+      padding: 10px;
+    }
+
+    .light-item {
+      background: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px;
+      margin-bottom: 10px;
+      border-radius: 10px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      transition: background 0.3s;
+    }
+
+    .light-label {
+      font-size: 18px;
+      flex-grow: 1;
+      cursor: pointer;
+    }
+
+    .light-icon {
+      font-size: 28px;
+      cursor: pointer;
+      transition: color 0.3s;
+    }
+
+    .on {
+      color: gold;
+    }
+
+    .off {
+      color: gray;
+    }
+
+    input.rename {
+      font-size: 18px;
+      width: 100%;
+      padding: 5px;
+      margin-top: 5px;
+    }
+  </style>
 </head>
 <body>
-  <h2>GLS ESP INTERNET</h2>
-  <button onclick="sendCommand('ON')">Turn ON</button>
-  <button onclick="sendCommand('OFF')">Turn OFF</button>
+  <div class="header">GLS ESP INTERNET</div>
+  <div class="light-list" id="lightList"></div>
 
   <script>
+    // Firebase Config
     const firebaseConfig = {
-  apiKey: "AIzaSyCbUMHr-1pWWlhlFuyG8E4AdfOYn5tWIhM",
-  authDomain: "food-details-554cf.firebaseapp.com",
-  databaseURL: "https://food-details-554cf-default-rtdb.firebaseio.com",
-  projectId: "food-details-554cf",
-  storageBucket: "food-details-554cf.firebasestorage.app",
-  messagingSenderId: "617865162295",
-  appId: "1:617865162295:web:e8e44fc0c45146ae2819b2",
-  measurementId: "G-VGYFY56WSV"
-};
+      apiKey: "AIzaSyCbUMHr-1pWWlhlFuyG8E4AdfOYn5tWIhM",
+      authDomain: "food-details-554cf.firebaseapp.com",
+      databaseURL: "https://food-details-554cf-default-rtdb.firebaseio.com",
+      projectId: "food-details-554cf",
+      storageBucket: "food-details-554cf.appspot.com",
+      messagingSenderId: "617865162295",
+      appId: "1:617865162295:web:e8e44fc0c45146ae2819b2",
+      measurementId: "G-VGYFY56WSV"
+    };
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    function sendCommand(cmd) {
-      db.ref("/device").set({ command: cmd });
+    // Sample Light States
+    let lights = [
+      { id: 0, label: "Living Room", state: false },
+      { id: 1, label: "Kitchen Light", state: false },
+      { id: 2, label: "Bedroom", state: false }
+    ];
+
+    // Load saved labels from localStorage (simulates EEPROM)
+    lights.forEach(light => {
+      const saved = localStorage.getItem("label_" + light.id);
+      if (saved) light.label = saved;
+    });
+
+    // Render Lights
+    function renderLights() {
+      const list = document.getElementById("lightList");
+      list.innerHTML = '';
+      lights.forEach(light => {
+        const item = document.createElement('div');
+        item.className = 'light-item';
+
+        const label = document.createElement('div');
+        label.className = 'light-label';
+        label.textContent = light.label;
+        label.ontouchstart = label.onmousedown = (e) => {
+          let timer = setTimeout(() => renameLabel(light.id, label), 800);
+          e.target.ontouchend = e.target.onmouseup = () => clearTimeout(timer);
+        };
+
+        const icon = document.createElement('div');
+        icon.className = 'light-icon ' + (light.state ? 'on' : 'off');
+        icon.innerHTML = '💡';
+        icon.onclick = () => {
+          light.state = !light.state;
+          sendCommand(light.id, light.state ? "ON" : "OFF");
+          renderLights();
+        };
+
+        item.appendChild(label);
+        item.appendChild(icon);
+        list.appendChild(item);
+      });
     }
+
+    function renameLabel(id, labelElement) {
+      const light = lights.find(l => l.id === id);
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.className = 'rename';
+      input.value = light.label;
+      labelElement.replaceWith(input);
+      input.focus();
+
+      input.onblur = () => {
+        light.label = input.value.trim() || light.label;
+        localStorage.setItem("label_" + light.id, light.label);
+        renderLights();
+      };
+    }
+
+    // Send command to Firebase
+    function sendCommand(id, cmd) {
+      db.ref("/device" + id).set({ command: cmd });
+    }
+
+    renderLights();
   </script>
 </body>
 </html>
