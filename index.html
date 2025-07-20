@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ESP Light Control</title>
+  <title>ESP Light Control (Dark Mode)</title>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
@@ -11,15 +11,17 @@
       font-family: Arial, sans-serif;
       margin: 0;
       padding: 0;
-      background: #f4f4f4;
+      background: #121212;
+      color: #eee;
     }
 
     .header {
-      background: #003366;
-      color: white;
+      background: #1e1e1e;
+      color: #ffffff;
       text-align: center;
       padding: 15px;
       font-size: 20px;
+      border-bottom: 1px solid #333;
     }
 
     .light-list {
@@ -29,20 +31,22 @@
     }
 
     .light-item {
-      background: white;
+      background: #1e1e1e;
       display: flex;
       justify-content: space-between;
       align-items: center;
       padding: 15px;
       margin-bottom: 10px;
       border-radius: 10px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+      transition: background 0.3s;
     }
 
     .light-label {
       font-size: 18px;
       flex-grow: 1;
       cursor: pointer;
+      color: #eee;
     }
 
     .light-icon {
@@ -52,25 +56,28 @@
     }
 
     .light-icon.on {
-      color: gold;
-      text-shadow: 0 0 10px gold, 0 0 20px orange;
+      color: #ffd700;
+      text-shadow: 0 0 10px #ffcc00, 0 0 20px #ffaa00;
     }
 
     .light-icon.off {
-      color: #888;
+      color: #555;
       text-shadow: none;
     }
 
     input.rename {
       font-size: 18px;
       width: 100%;
-      padding: 5px;
-      margin-top: 5px;
+      padding: 6px;
+      background: #222;
+      color: #eee;
+      border: 1px solid #444;
+      border-radius: 5px;
     }
   </style>
 </head>
 <body>
-  <div class="header">GLS ESP INTERNET</div>
+  <div class="header">🌙 GLS ESP DARK MODE</div>
   <div class="light-list" id="lightList"></div>
 
   <script>
@@ -89,14 +96,13 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // Sample Lights
     let lights = [
       { id: 0, label: "Living Room", state: false },
       { id: 1, label: "Kitchen Light", state: false },
       { id: 2, label: "Bedroom", state: false }
     ];
 
-    // Load stored labels
+    // Load custom names
     lights.forEach(light => {
       const saved = localStorage.getItem("label_" + light.id);
       if (saved) light.label = saved;
