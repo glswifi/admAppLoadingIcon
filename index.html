@@ -5,6 +5,7 @@
   <title>ESP Light Control</title>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -36,7 +37,6 @@
       margin-bottom: 10px;
       border-radius: 10px;
       box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      transition: background 0.3s;
     }
 
     .light-label {
@@ -48,15 +48,17 @@
     .light-icon {
       font-size: 28px;
       cursor: pointer;
-      transition: color 0.3s;
+      transition: color 0.3s, text-shadow 0.3s;
     }
 
-    .on {
+    .light-icon.on {
       color: gold;
+      text-shadow: 0 0 10px gold, 0 0 20px orange;
     }
 
-    .off {
-      color: gray;
+    .light-icon.off {
+      color: #888;
+      text-shadow: none;
     }
 
     input.rename {
@@ -87,20 +89,19 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // Sample Light States
+    // Sample Lights
     let lights = [
       { id: 0, label: "Living Room", state: false },
       { id: 1, label: "Kitchen Light", state: false },
       { id: 2, label: "Bedroom", state: false }
     ];
 
-    // Load saved labels from localStorage (simulates EEPROM)
+    // Load stored labels
     lights.forEach(light => {
       const saved = localStorage.getItem("label_" + light.id);
       if (saved) light.label = saved;
     });
 
-    // Render Lights
     function renderLights() {
       const list = document.getElementById("lightList");
       list.innerHTML = '';
@@ -111,14 +112,14 @@
         const label = document.createElement('div');
         label.className = 'light-label';
         label.textContent = light.label;
+
         label.ontouchstart = label.onmousedown = (e) => {
           let timer = setTimeout(() => renameLabel(light.id, label), 800);
           e.target.ontouchend = e.target.onmouseup = () => clearTimeout(timer);
         };
 
-        const icon = document.createElement('div');
-        icon.className = 'light-icon ' + (light.state ? 'on' : 'off');
-        icon.innerHTML = '💡';
+        const icon = document.createElement('i');
+        icon.className = `fas fa-lightbulb light-icon ${light.state ? 'on' : 'off'}`;
         icon.onclick = () => {
           light.state = !light.state;
           sendCommand(light.id, light.state ? "ON" : "OFF");
@@ -147,7 +148,6 @@
       };
     }
 
-    // Send command to Firebase
     function sendCommand(id, cmd) {
       db.ref("/device" + id).set({ command: cmd });
     }
